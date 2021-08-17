@@ -29,6 +29,7 @@ const User = sequelize.define("User", {
         // defaultValue: path to default pic
         allowNull: true
     }
+    //ajouter "biographie"
 });
 
 async function reset() {

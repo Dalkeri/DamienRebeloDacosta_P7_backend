@@ -19,14 +19,15 @@ Thread.belongsTo(User);
 // Comment.belongsTo(User);
 
 async function resetAll(){
-    await User.sync({ force: true });
     await Thread.sync({ force: true });
+    await User.sync({ force: true });
     // await Comment.sync({ force: true });
     // await Like.sync({ force: true });
 
     console.log("reset all");
 }
 // resetAll();
+// deleteAll et createAll pour suppr dans le bon ordre et recréer dans le bon ordre
 
 const users = [
     {

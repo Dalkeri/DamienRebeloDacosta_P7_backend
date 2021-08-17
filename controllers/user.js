@@ -40,4 +40,4 @@ exports.getOne = async (userId) => {
 }
 
 
-//ajouter la modif de son compte
+//ajouter la modif de son compte password photo et bio
