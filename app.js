@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser =  require('body-parser');
-const { Sequelize, DataTypes } = require('sequelize');
+// const { Sequelize, DataTypes } = require('sequelize');
 
 const userRoutes = require('./routes/user');
 const threadRoutes = require('./routes/thread');
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-app.use('/api/auth', userRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/thread', threadRoutes);
 app.use('/api/comment', commentRoutes);
 app.use('/api/like', likeRoutes);
