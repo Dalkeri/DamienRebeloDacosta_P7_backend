@@ -6,6 +6,7 @@ const UserController = require('../controllers/User');
 exports.create = async (req, res, next) => {
     console.log("req", req.body);
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
+
     const thread = await Thread.create({...req.body});
     res.json(thread);
 };
@@ -33,7 +34,10 @@ exports.getAll = async (req, res, next) => {
         include : [{
             model: User,
             attributes: [ 'firstName', 'lastName' ]
-        }]
+        }],
+        order: [
+            ['id', 'DESC']
+        ]
     });
     // for (const thread of threads){
     //     console.log("for ", thread.userId);

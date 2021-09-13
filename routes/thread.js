@@ -5,7 +5,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const threadCtrl = require('../controllers/thread');
 
-router.post('/', auth, threadCtrl.create);
+router.post('/create', auth, threadCtrl.create);
 router.get('/:id', threadCtrl.getOne);
 router.get('/', threadCtrl.getAll);
 router.delete('/:id', auth, threadCtrl.delete);

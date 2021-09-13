@@ -4,15 +4,15 @@ module.exports = (req, res, next) => {
   console.log("req.headers.authorization", req.headers.authorization);
   try {
     const token = req.headers.authorization.split(' ')[1];
-    // console.log("1", token);
+    console.log("1", token);
     const decodedToken = jwt.verify(token, "USER_SECRET_TOKEN");
-    // console.log("2",decodedToken);
+    console.log("2",decodedToken);
     const userId = decodedToken.userId;
-    // console.log("3",userId);
+    console.log("3",userId);
     if (req.body.userId && req.body.userId !== userId) {
       throw 'Invalid user ID';
     } else {
-      req.body.userId = userId;
+      req.body.UserId = userId;
       next();
     }
   } catch {
