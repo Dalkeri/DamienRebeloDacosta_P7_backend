@@ -8,7 +8,10 @@ exports.create = async (req, res, next) => {
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
 
     const thread = await Thread.create({...req.body});
-    res.json(thread);
+    // console.log(thread);
+    res.status(200).json({thread});
+
+    // res.json(thread);
 };
 
 exports.getOne = async (req, res, next) => {
@@ -23,7 +26,7 @@ exports.getOne = async (req, res, next) => {
 };
 
 exports.getAll = async (req, res, next) => {
-    console.log("getAll", Thread);
+    // console.log("getAll", Thread);
     const threads = await Thread.findAll({
         // include: [{
         //     model: User,
@@ -47,7 +50,7 @@ exports.getAll = async (req, res, next) => {
     //     thread.firstName = creator.firstName;
     //     thread.lastName = creator.lastName;
     // };
-    console.log(threads);
+    // console.log(threads);
     return res.json(threads);
 };
 
@@ -58,16 +61,28 @@ exports.getCreator = async (userId) => {
 
 //pas { modification }   ???
 exports.modify = async (req, res, next) => {
-    console.log("modify", req.params);
-    let modification = {...req.body};
+    console.log("modify body", req.body);
+    console.log("modify params", req.params);
+    let modification = {
+        title: req.body.title,
+        content: req.body.content
+    };
     console.log("modif", modification);
-    const threadModif = await Thread.update( modification, {
-        where: {
-          id: req.params.id
-        }
-      });
+    const thread = await Thread.findByPk(req.params.id, { raw: true });
+    console.log("modify thread", thread);
+    if( thread.UserId == req.body.UserId){
+        const threadModif = await Thread.update( modification, {
+            where: {
+              id: req.params.id
+            }
+          });
+        console.log(threadModif);
+        res.status(200).json({message: "Content modified successfully"});
+    } else {
+        res.status(201).json({message: "You can't modify this"});
+    }
+    
 
-    console.log(threadModif);
 };
 
 exports.delete = async (req, res, next) => {

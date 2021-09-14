@@ -44,15 +44,55 @@ exports.login = async (req, res, next) => {
   }
 };
 
+exports.autoLogin = async (req, res, next) => {
+  console.log("autoLogin ", req.body);
+  const user = await User.findOne({ where:  { id: req.body.UserId } });
+  if(user == null){
+    res.status(404).json({message: "An error occured"});
+  } 
+  if( req.body.auto ){
+    console.log("CONNECTED");
+    res.status(200).json({
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        admin: user.admin,
+        profilPic: user.profilPic
+      },
+      token: jwt.sign(
+        { userId: user.id },
+        'USER_SECRET_TOKEN',
+        { expiresIn: '24h' }
+      )
+    });
+  } else {
+    console.log("NOT CONNECTED");
+    res.status(500).json({message: "An error occured"});
+}
+};
+
 exports.getOne = async (userId) => {
   console.log("getOne user ", userId);
   const user = await User.findOne({ where: {id: userId}});
   if(user != undefined){
-    return {firstName: user.firstName, lastName: user.lastName};
+    res.status(200).json({
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        admin: user.admin,
+        profilPic: user.profilPic
+      },
+      token: jwt.sign(
+        { userId: user.id },
+        'USER_SECRET_TOKEN',
+        { expiresIn: '24h' }
+      )
+    });
   } else {
     console.log("user not found");
   }
-}
-
-
-//ajouter la modif de son compte password photo et bio
+};
