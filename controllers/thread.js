@@ -87,9 +87,15 @@ exports.modify = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     console.log("delete");
-    const threadDelete =  await Thread.destroy({
-        where: {
-          id: req.params.id
-        }
-      });
+    try{
+        const threadDelete =  await Thread.destroy({
+            where: {
+            id: req.params.id
+            }
+        });
+        res.status(200).json({message: "Thread deleted successfully"});
+    } catch (error) {
+        res.status(400).json({message: "Error while deleting"});
+    }
+    
 };
