@@ -1,6 +1,7 @@
 const Thread = require('../Models/thread');
 const User = require('../Models/User');
-const UserController = require('../controllers/User');
+const Comment = require('../models/Comment');
+
 // console.log("thread controller", Thread);
 
 exports.create = async (req, res, next) => {
@@ -35,13 +36,21 @@ exports.getAll = async (req, res, next) => {
         //     }
         // }]
         include : [{
-            model: User,
-            attributes: [ 'firstName', 'lastName' ]
-        }],
+                        model: User,
+                        attributes: [ 'firstName', 'lastName' ]
+                  },
+                  {
+                      model: Comment,
+                      attributes: [ 'id', 'content', 'UserId'],
+                      include: [{ model: User, attributes: [ 'firstName', 'lastName']}]
+                  }
+        ],
         order: [
             ['id', 'DESC']
         ]
     });
+
+    const comments = await Comment.fi
     // for (const thread of threads){
     //     console.log("for ", thread.userId);
     //     console.log("for ", thread);

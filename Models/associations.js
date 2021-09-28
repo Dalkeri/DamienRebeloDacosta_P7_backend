@@ -2,32 +2,46 @@ const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require("../database");
 
 const Thread = require("./thread");
-// const Comment = require("./comment");
-// const Like = require("./like");
+const Comment = require("./comment");
 const User = require('./user');
 
 User.hasMany(Thread);
-// User.hasMany(Comment);
+User.hasMany(Comment);
 
 Thread.belongsTo(User);
-// Thread.hasMany(Like);
-// Thread.hasMany(Comment);
+Thread.hasMany(Comment);
 
-// Like.belongsTo(Thread);
+Comment.belongsTo(Thread);
+Comment.belongsTo(User);
 
-// Comment.belongsTo(Thread);
-// Comment.belongsTo(User);
 
-async function resetAll(){
+
+console.log("associations");
+
+async function createAll(){
     await User.sync({ force: true });
     await Thread.sync({ force: true });
-    // await Comment.sync({ force: true });
+    await Comment.sync({ force: true });
     // await Like.sync({ force: true });
 
-    console.log("reset all");
+    console.log("create all");
 }
-// resetAll();
+// createAll();
+
+async function deleteAll(){
+    await Comment.destroy({  });
+    await Thread.destroy({  });
+    await User.destroy({  });
+    // await Like.sync({ force: true });
+
+    console.log("resetAll");
+}
+// deleteAll();
 // deleteAll et createAll pour suppr dans le bon ordre et recréer dans le bon ordre
+
+
+
+
 
 const users = [
     {
@@ -78,3 +92,29 @@ async function createBasicThreads(){
       }
 }
 // createBasicThreads();
+
+
+const comments = [
+    {
+        content: "Bonjour 2",
+        UserId: 1,
+        ThreadId: 2
+    },
+    {
+        content: "Bonjour 2",
+        UserId: 2,
+        ThreadId: 1
+    }
+];
+
+async function createBasicComments(){
+    try{
+        for(let i=0; i<comments.length; i++){
+            await Comment.create({...comments[i]});
+        }
+    }catch (err) {
+        console.log("error createBasicComments", err);
+      }
+}
+// createBasicComments();
+

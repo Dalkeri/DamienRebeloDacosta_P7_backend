@@ -1,6 +1,17 @@
 const Comment = require('../models/Comment');
-const Thread = require('../models/Thread');
+const Thread = require('../models/thread');
+const User = require('../models/User');
 // console.log("comment controller")
+
+// User.hasMany(Thread);
+// User.hasMany(Comment);
+
+// Thread.belongsTo(User);
+// Thread.hasMany(Comment);
+
+// Comment.belongsTo(Thread);
+// Comment.belongsTo(User);
+
 exports.create = async (req, res, next) => {
     console.log("req", req.body);
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
@@ -10,20 +21,30 @@ exports.create = async (req, res, next) => {
 
 exports.getOne = async (req, res, next) => {
     console.log("getOne");
-    //findByPK
+    
     const comment = await Comment.findByPk(req.params.id, {
         raw: true
     });
 
-    // console.log(comment);
+    console.log(comment);
     return res.json(comment);
 };
 
 exports.getAll = async (req, res, next) => {
-    console.log("getAll");
+    console.log("getAll", req.params);
     const comments = await Comment.findAll({
-        raw: true,
-        include: User
+        // raw: true,
+        include : [{
+                    model: User,
+                    attributes: [ 'firstName', 'lastName' ]
+                  }
+        ],
+        where: {
+            ThreadId: req.params.threadId
+        },
+        order: [
+            ['id', 'DESC']
+        ]
     });
   
     console.log(comments);

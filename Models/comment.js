@@ -7,7 +7,7 @@ const Comment = sequelize.define("Comment", {
     //     type: DataTypes.INTEGER,
     //     allowNull: false,
     //     references: {
-    //         model: 'users',
+    //         model: 'Users',
     //         key: 'id'
     //     }
     // },
@@ -15,7 +15,7 @@ const Comment = sequelize.define("Comment", {
     //     type: DataTypes.INTEGER,
     //     allowNull: false,
     //     references: {
-    //         model: 'threads',
+    //         model: 'Threads',
     //         key: 'id'
     //     }
     // },
