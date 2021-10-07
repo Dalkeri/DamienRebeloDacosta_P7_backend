@@ -1,6 +1,6 @@
-const Thread = require('../Models/thread');
-const User = require('../Models/User');
-const Comment = require('../models/Comment');
+const { Thread, User, Comment } = require('../models')
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op
 
 // console.log("thread controller", Thread);
 
@@ -9,17 +9,30 @@ exports.create = async (req, res, next) => {
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
 
     const thread = await Thread.create({...req.body});
-    // console.log(thread);
+    console.log(thread);
     res.status(200).json({thread});
 
     // res.json(thread);
 };
 
 exports.getOne = async (req, res, next) => {
-    console.log("getOne");
+    console.log("getOne", req.params);
     //findByPK
-    const thread = await Thread.findByPk(req.params.id, {
-        raw: true
+    const thread = await Thread.findOne({
+         include : [{
+                        model: User,
+                        attributes: [ 'firstName', 'lastName' ]
+                  }
+                  ,
+                  {
+                      model: Comment,
+                      attributes: [ 'id', 'content', 'UserId'],
+                      include: [{ model: User, attributes: [ 'firstName', 'lastName']}]
+                  }
+        ],
+        where: {
+            id: req.params.id
+        }
     });
 
     // console.log(thread);
@@ -27,7 +40,7 @@ exports.getOne = async (req, res, next) => {
 };
 
 exports.getAll = async (req, res, next) => {
-    // console.log("getAll", Thread);
+    console.log("getAll", Thread);
     const threads = await Thread.findAll({
         // include: [{
         //     model: User,
@@ -38,7 +51,8 @@ exports.getAll = async (req, res, next) => {
         include : [{
                         model: User,
                         attributes: [ 'firstName', 'lastName' ]
-                  },
+                  }
+                  ,
                   {
                       model: Comment,
                       attributes: [ 'id', 'content', 'UserId'],
@@ -50,7 +64,7 @@ exports.getAll = async (req, res, next) => {
         ]
     });
 
-    const comments = await Comment.fi
+    // const comments = await Comment.fi
     // for (const thread of threads){
     //     console.log("for ", thread.userId);
     //     console.log("for ", thread);

@@ -1,4 +1,7 @@
-const User  = require('../models/user');
+const { User } = require('../models')
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op
+
 const jwt = require('jsonwebtoken');
 const { response } = require('../app');
 // console.log("user controller")
@@ -16,7 +19,8 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-    console.log("req.body", req.body);
+  console.log("req.body", req.body);
+  // console.log("USER", User);
   const user = await User.findOne({ where:  { email: req.body.email } });
   if(user == null){
     res.status(404).json({message: "wrong username"});
@@ -76,7 +80,7 @@ exports.autoLogin = async (req, res, next) => {
 
 exports.getOne = async (userId) => {
   console.log("getOne user ", userId);
-  const user = await User.findOne({ where: {id: userId}});
+  // const user = await User.findOne({ where: {id: userId}});
   if(user != undefined){
     res.status(200).json({
       user: {

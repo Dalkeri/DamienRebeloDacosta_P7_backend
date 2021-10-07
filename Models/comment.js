@@ -1,38 +1,32 @@
-const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require("../database");
-// console.log("comment.js model");
-
-const Comment = sequelize.define("Comment", {
-    // userId: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     references: {
-    //         model: 'Users',
-    //         key: 'id'
-    //     }
-    // },
-    // threadId: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     references: {
-    //         model: 'Threads',
-    //         key: 'id'
-    //     }
-    // },
-    content: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    visible : {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Comment extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      Comment.belongsTo(models.User, {
+        foreignKey: 'userId'
+      });
+      Comment.belongsTo(models.Thread, {
+        foreignKey: 'threadId'
+      })
     }
-});
-
-async function reset() {
-    await Comment.sync({ force: true });
-}
-// reset();
-
-module.exports = Comment;
+  };
+  Comment.init({
+    content: DataTypes.STRING,
+    visible: DataTypes.BOOLEAN,
+    userId: DataTypes.INTEGER,
+    threadId: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'Comment',
+  });
+  return Comment;
+};

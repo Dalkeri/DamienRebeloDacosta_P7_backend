@@ -5,7 +5,7 @@ const bodyParser =  require('body-parser');
 const userRoutes = require('./routes/user');
 const threadRoutes = require('./routes/thread');
 const commentRoutes = require('./routes/comment');
-const likeRoutes = require('./routes/like');
+// const likeRoutes = require('./routes/like');
 
 const app = express();
 
@@ -21,8 +21,8 @@ app.use(bodyParser.json());
 app.use('/api/user', userRoutes);
 app.use('/api/thread', threadRoutes);
 app.use('/api/comment', commentRoutes);
-app.use('/api/like', likeRoutes);
+// app.use('/api/like', likeRoutes);
 
-const associations = require('./Models/associations')
+// const associations = require('./Models/associations')
 
 module.exports = app;

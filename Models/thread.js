@@ -1,38 +1,33 @@
-const {  DataTypes } = require('sequelize');
-const sequelize = require("../database");
-// console.log("thread.js model");
-
-const Thread = sequelize.define("Thread", {
-    // userId: {
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false,
-    //     references: {
-    //         model: 'Users',
-    //         key: 'id'
-    //     }
-    // },
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    content: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    contentImg : {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    visible : {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Thread extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      Thread.belongsTo(models.User, {
+        foreignKey: 'userId'
+      });
+      Thread.hasMany(models.Comment, {
+        foreignKey: 'threadId'
+      })
     }
-});
-
-async function reset() {
-    await Thread.sync({ force: true });
-}
-// reset();
-
-module.exports = Thread;
+  };
+  Thread.init({
+    title: DataTypes.STRING,
+    content: DataTypes.STRING,
+    contentImg: DataTypes.STRING,
+    visible: DataTypes.BOOLEAN,
+    userId: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'Thread',
+  });
+  return Thread;
+};
