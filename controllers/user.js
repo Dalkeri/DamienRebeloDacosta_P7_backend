@@ -51,7 +51,7 @@ exports.login = async (req, res, next) => {
 exports.autoLogin = async (req, res, next) => {
   console.log("autoLogin ", req.body);
   // console.log("decoded ", decodedToken);
-  const user = await User.findOne({ where:  { id: req.body.UserId } });
+  const user = await User.findOne({ where:  { id: req.body.userId } });
   if(user == null){
     res.status(404).json({message: "An error occured"});
   } 

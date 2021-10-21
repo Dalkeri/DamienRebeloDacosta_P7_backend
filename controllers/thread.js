@@ -26,7 +26,7 @@ exports.getOne = async (req, res, next) => {
                   ,
                   {
                       model: Comment,
-                      attributes: [ 'id', 'content', 'UserId'],
+                      attributes: [ 'id', 'content', 'userId'],
                       include: [{ model: User, attributes: [ 'firstName', 'lastName']}]
                   }
         ],
@@ -55,7 +55,7 @@ exports.getAll = async (req, res, next) => {
                   ,
                   {
                       model: Comment,
-                      attributes: [ 'id', 'content', 'UserId'],
+                      attributes: [ 'id', 'content', 'userId'],
                       include: [{ model: User, attributes: [ 'firstName', 'lastName']}]
                   }
         ],
@@ -84,8 +84,8 @@ exports.getCreator = async (userId) => {
 
 //pas { modification }   ???
 exports.modify = async (req, res, next) => {
-    console.log("modify body", req.body);
-    console.log("modify params", req.params);
+    // console.log("modify body", req.body);
+    // console.log("modify params", req.params);
     let modification = {
         title: req.body.title,
         content: req.body.content
@@ -93,19 +93,13 @@ exports.modify = async (req, res, next) => {
     console.log("modif", modification);
     const thread = await Thread.findByPk(req.params.id, { raw: true });
     console.log("modify thread", thread);
-    if( thread.UserId == req.body.UserId){
-        const threadModif = await Thread.update( modification, {
-            where: {
-              id: req.params.id
-            }
-          });
-        console.log(threadModif);
-        res.status(200).json({message: "Content modified successfully"});
-    } else {
-        res.status(201).json({message: "You can't modify this"});
-    }
-    
-
+    const threadModif = await Thread.update( modification, {
+        where: {
+            id: req.params.id
+        }
+    });
+    console.log(threadModif);
+    res.status(200).json({message: "Content modified successfully"});
 };
 
 exports.delete = async (req, res, next) => {

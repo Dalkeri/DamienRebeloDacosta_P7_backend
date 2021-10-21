@@ -11,22 +11,23 @@ module.exports = (req, res, next) => {
 
     console.log("decodedToken ",decodedToken);
     const userId = decodedToken.userId;
+    
     console.log("req.body ",req.body);
-    if(req.body.auto){
-      req.body.UserId = decodedToken.userId;
-    }
+    // if(req.body.auto){
+      req.body.userId = decodedToken.userId;
+    // }
     // if( !req.body.auto ) {
       // if (req.body.userId && req.body.userId !== userId) {
       //   throw 'Invalid user ID';
       // } else {
-      //   console.log("req.body.UserId = userId;", req.body.UserId = userId);
-      //   req.body.UserId = userId;
+      //   console.log("req.body.userId = userId;", req.body.userId = userId);
+      //   req.body.userId = userId;
       console.log("next");
       next();
       // }
     // } else {
     //   console.log("auto");
-    //   req.body.UserId = userId;
+    //   req.body.userId = userId;
     //   next();
     // }
     
