@@ -1,32 +1,24 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Threads', {
+    await queryInterface.createTable('Comments', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
-        type: Sequelize.STRING
-      },
       content: {
-        type: Sequelize.STRING
-      },
-      contentImg: {
         type: Sequelize.STRING
       },
       visible: {
         type: Sequelize.BOOLEAN
       },
       userId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id',
-          as: 'userId',
-        }
+        type: Sequelize.INTEGER
+      },
+      threadId: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
@@ -39,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Threads');
+    await queryInterface.dropTable('Comments');
   }
 };

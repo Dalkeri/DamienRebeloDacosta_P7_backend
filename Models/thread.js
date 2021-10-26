@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
   Thread.init({
     title: DataTypes.STRING,
     content: DataTypes.STRING,
-    contentImg: DataTypes.STRING,
+    image: DataTypes.STRING,
     visible: DataTypes.BOOLEAN,
     userId: DataTypes.INTEGER
   }, {
