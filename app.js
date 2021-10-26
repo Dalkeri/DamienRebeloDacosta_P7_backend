@@ -18,6 +18,10 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
+app.use(express.static('public'));  
+app.use('/images', express.static('images')); 
+
+
 app.use('/api/user', userRoutes);
 app.use('/api/thread', threadRoutes);
 app.use('/api/comment', commentRoutes);

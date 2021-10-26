@@ -1,14 +1,21 @@
 const { Thread, User, Comment } = require('../models')
 const Sequelize = require('sequelize');
+const fs = require('fs');
+
 const Op = Sequelize.Op
 
 // console.log("thread controller", Thread);
 
 exports.create = async (req, res, next) => {
-    console.log("req", req.body);
+    console.log("req.body", req.body);
+    console.log("req.file", req.file);
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
+    const threadDatas = {
+        ...req.body,
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
 
-    const thread = await Thread.create({...req.body});
+    }
+    const thread = await Thread.create(threadDatas);
     console.log(thread);
     res.status(200).json({thread});
 
