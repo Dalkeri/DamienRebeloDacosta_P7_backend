@@ -11,10 +11,37 @@ exports.signup = async (req, res, next) => {
     console.log("coucou");
     try{
       const user = await User.create({...req.body});
-      res.status(201).json({message: "Utilisateur créé"});
+      console.log({user});
+      // token: jwt.sign(
+      //   { userId: user.id },
+      //   'USER_SECRET_TOKEN',
+      //   { expiresIn: '24h' }
+      // )
+      // res.status(201).json({message: "Utilisateur créé"});
+      console.log(user.dataValues.id);
+      return res.status(201).json({
+        // TODO: create function to do that
+        user: { 
+          id: user.dataValues.id,
+          firstName: user.dataValues.firstName,
+          lastName: user.dataValues.lastName,
+          email: user.dataValues.email,
+          admin: user.vadmin,
+          profilPic: user.dataValues.profilPic
+        },
+        token: jwt.sign(
+          { userId: user.id },
+          'USER_SECRET_TOKEN',
+          { expiresIn: '24h' }
+        )
+      });
     } catch (err) {
-      console.log("ERROR ", err);
-      res.status(500).json({message: "Utilisateur non créé"});
+      console.log("ERROR ");
+      console.log(err.errors);
+      if(err.errors[0].validatorKey == "not_unique") {
+        return res.status(500).json({message: "Les emails doivent être unique"});
+      }
+      return res.status(500).json({message: "Il y a eu une erreur lors de la création"});
     }
 };
 
@@ -22,12 +49,13 @@ exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
   const user = await User.findOne({ where:  { email: req.body.email } });
+  console.log("USER : ", user);
   if(user == null){
-    res.status(404).json({message: "wrong username"});
+    return res.status(500).json({message: "Informations de connexions incorrectes (user)"});
   }
   if(user.getDataValue('password') == req.body.password){
       console.log("CONNECTED");
-      res.status(200).json({
+      return res.status(200).json({
         user: {
           id: user.id,
           firstName: user.firstName,
@@ -42,10 +70,11 @@ exports.login = async (req, res, next) => {
           { expiresIn: '24h' }
         )
       });
-  } else {
-      console.log("NOT CONNECTED");
-      res.status(500).json({message: "Mot de passe incorrect"});
   }
+
+  console.log("NOT CONNECTED");
+  return res.status(500).json({message: "Informations de connexions incorrectes (mdp)"});
+  
 };
 
 exports.autoLogin = async (req, res, next) => {

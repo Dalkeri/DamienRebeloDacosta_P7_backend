@@ -9,10 +9,12 @@ const hasRights = require('../middleware/hasRights');
 const threadCtrl = require('../controllers/thread');
 
 router.post('/create', auth, multer, threadCtrl.create);
+
+//add auth 
 router.get('/:id', threadCtrl.getOne);
 router.get('/', threadCtrl.getAll);
 router.delete('/:id', auth, threadCtrl.delete);
-router.put('/modify/:id', auth, hasRights, threadCtrl.modify);
+router.put('/modify/:id', auth, hasRights, multer, threadCtrl.modify);
 
 // router.post('/:id/likes', threadCtrl.likes);
 

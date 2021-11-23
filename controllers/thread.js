@@ -7,13 +7,13 @@ const Op = Sequelize.Op
 // console.log("thread controller", Thread);
 
 exports.create = async (req, res, next) => {
-    console.log("req.body", req.body);
-    console.log("req.file", req.file);
+    // console.log("req.body", req.body);
+    // console.log("req.file", req.file);
+    let img = req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null;
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
     const threadDatas = {
         ...req.body,
-        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-
+        image: img
     }
     const thread = await Thread.create(threadDatas);
     console.log(thread);
@@ -91,11 +91,13 @@ exports.getCreator = async (userId) => {
 
 //pas { modification }   ???
 exports.modify = async (req, res, next) => {
+    console.log(req.file);
     // console.log("modify body", req.body);
     // console.log("modify params", req.params);
     let modification = {
         title: req.body.title,
-        content: req.body.content
+        content: req.body.content,
+        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     };
     console.log("modif", modification);
     const thread = await Thread.findByPk(req.params.id, { raw: true });

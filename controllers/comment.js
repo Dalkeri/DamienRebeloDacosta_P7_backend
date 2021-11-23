@@ -49,17 +49,14 @@ exports.modify = async (req, res, next) => {
     console.log("modif", modification);
     const comment = await Comment.findByPk(req.params.id, { raw: true });
     console.log("modify comment", comment);
-    if( comment.userId == req.body.userId){
-        const commentModif = await Comment.update( modification, {
-            where: {
-              id: req.params.id
-            }
-          });
-        console.log(commentModif);
-        res.status(200).json({message: "Content modified successfully"});
-    } else {
-        res.status(201).json({message: "You can't modify this"});
-    }
+
+    const commentModif = await Comment.update( modification, {
+                                                    where: {
+                                                    id: req.params.id
+                                                    }
+                                                });
+    // console.log(commentModif);
+    res.status(200).json({message: "Content modified successfully"});
 };
 
 exports.delete = async (req, res, next) => {

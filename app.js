@@ -7,6 +7,9 @@ const threadRoutes = require('./routes/thread');
 const commentRoutes = require('./routes/comment');
 // const likeRoutes = require('./routes/like');
 
+// const db = require('./models/index');
+// db.sequelize.sync({force:true});
+
 const app = express();
 
 app.use((req, res, next) => {

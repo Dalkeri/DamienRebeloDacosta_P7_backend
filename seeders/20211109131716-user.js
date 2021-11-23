@@ -33,6 +33,7 @@ module.exports = {
         lastName: 'test',
         email: 'test@gmail.com',
         password: 'Test1234',
+        admin: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       }

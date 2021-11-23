@@ -15,10 +15,22 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       userId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Users',
+          key: 'id',
+          as: 'userId',
+        }
       },
       threadId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Threads',
+          key: 'id',
+          as: 'threadId',
+        }
       },
       createdAt: {
         allowNull: false,

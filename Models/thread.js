@@ -12,10 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Thread.belongsTo(models.User, {
-        foreignKey: 'userId'
+        foreignKey: 'userId',
+        onDelete:'cascade'
       });
       Thread.hasMany(models.Comment, {
-        foreignKey: 'threadId'
+        foreignKey: 'threadId',
+        onDelete:'cascade'
       })
     }
   };
