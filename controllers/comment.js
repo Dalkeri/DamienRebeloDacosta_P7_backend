@@ -43,6 +43,20 @@ exports.getAll = async (req, res, next) => {
     return res.json(comments);
 };
 
+// exports.getAllFromUser = async (req, res, next) => {
+//     console.log("getAllFromUser");
+//     const comments = await Comment.findAll(      
+//         where: {
+//             userId: req.body.userId
+//         },                    SELECT * FROM users JOIN comments ON users.id = comments.userId JOIN threads ON comments.threadId = threads.id WHERE users.userId = 1
+//         order: [          SELECT * FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments JOIN users ON comments.userId = users.id WHERE users.id = 1)
+//             ['id', 'DESC']
+//         ]
+//     });
+
+//     return res.json(comments);
+// }
+
 exports.modify = async (req, res, next) => {
     console.log("modify comment", req.body);
     let modification = {content : req.body.content};

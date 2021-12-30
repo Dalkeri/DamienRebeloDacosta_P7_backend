@@ -17,6 +17,7 @@ module.exports = {
         lastName: 'Doe',
         email: 'John@John.com',
         password: 'John',
+        bio: 'Hi, I\'m John',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -25,6 +26,7 @@ module.exports = {
         lastName: 'Joe',
         email: 'Jane@Jane.com',
         password: 'Jane',
+        bio: 'Hi, I\'m Jane',
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -33,6 +35,7 @@ module.exports = {
         lastName: 'test',
         email: 'test@gmail.com',
         password: 'Test1234',
+        bio: '',
         admin: 1,
         createdAt: new Date(),
         updatedAt: new Date()

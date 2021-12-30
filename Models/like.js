@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Thread extends Model {
+  class Like extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,25 +11,27 @@ module.exports = (sequelize, DataTypes) => {
      */
      static associate(models) {
       // define association here
-      Thread.belongsTo(models.User, {
+      Like.belongsTo(models.User, {
         foreignKey: 'userId',
         onDelete:'cascade'
       });
-      Thread.hasMany(models.Comment, {
+      Like.belongsTo(models.Thread, {
         foreignKey: 'threadId',
+        onDelete:'cascade'
+      });
+      Like.belongsTo(models.Comment, {
+        foreignKey: 'commentId',
         onDelete:'cascade'
       })
     }
   };
-  Thread.init({
-    title: DataTypes.STRING,
-    content: DataTypes.TEXT,
-    image: DataTypes.STRING,
-    visible: DataTypes.BOOLEAN,
-    userId: DataTypes.INTEGER
+  Like.init({
+    userId: DataTypes.INTEGER,
+    threadId: DataTypes.INTEGER,
+    commentId: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Thread',
+    modelName: 'Like',
   });
-  return Thread;
+  return Like;
 };

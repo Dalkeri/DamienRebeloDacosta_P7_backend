@@ -13,7 +13,9 @@ router.post('/create', auth, multer, threadCtrl.create);
 //add auth 
 router.get('/:id', threadCtrl.getOne);
 router.get('/', threadCtrl.getAll);
-router.delete('/:id', auth, threadCtrl.delete);
+router.get('/getThreadFromUser/:id', auth, threadCtrl.getAllFromUser);
+router.get('/getThreadFromUserComments/:id', auth, threadCtrl.getAllFromUserComments);
+router.delete('/:id', auth, threadCtrl.delete); //add hasRights
 router.put('/modify/:id', auth, hasRights, multer, threadCtrl.modify);
 
 // router.post('/:id/likes', threadCtrl.likes);

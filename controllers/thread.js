@@ -1,5 +1,5 @@
-const { Thread, User, Comment } = require('../models')
-const Sequelize = require('sequelize');
+const { Thread, User, Comment, sequelize } = require('../models')
+const { Sequelize, QueryTypes} = require('sequelize');
 const fs = require('fs');
 
 const Op = Sequelize.Op
@@ -83,6 +83,47 @@ exports.getAll = async (req, res, next) => {
     // console.log(threads);
     return res.json(threads);
 };
+
+exports.getAllFromUser = async (req, res, next) => {
+    console.log("getAllFromUser");
+    const threads = await Thread.findAll({
+        where: {
+            userId: req.body.userId
+        },
+        order: [
+            ['id', 'DESC']
+        ]
+    });
+
+    return res.json(threads);
+}
+
+//SELECT * FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments JOIN users ON comments.userId = users.id WHERE users.id = 1)
+//SELECT threads.title FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments WHERE userId = 1)
+// inner join
+exports.getAllFromUserComments = async (req, res, next) => {
+    console.log("getAllFromUserComments", req.body);
+    const results = await sequelize.query(
+        'SELECT * FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments JOIN users ON comments.userId = users.id WHERE users.id = :id)',
+        {
+            replacements: { id: req.body.userId},
+            type: QueryTypes.SELECT
+        }
+    )
+
+    const results2 = await Comment.findAll({
+        include : [{
+                model: User,
+            }
+        ],
+        order: [
+            ['id', 'DESC']
+        ]
+    });
+
+    console.log("coucou", results);
+    return res.json(results);
+}
 
 exports.getCreator = async (userId) => {
 

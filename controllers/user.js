@@ -1,14 +1,19 @@
 const { User } = require('../models')
 const Sequelize = require('sequelize');
+const fs = require('fs');
 const Op = Sequelize.Op
 
 const jwt = require('jsonwebtoken');
 const { response } = require('../app');
-// console.log("user controller")
+const { CONNREFUSED } = require('dns');
 
 exports.signup = async (req, res, next) => {
     console.log("req", req.body);
     console.log("coucou");
+
+    //check mdp
+    req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profil/default_profil.png`; 
+
     try{
       const user = await User.create({...req.body});
       console.log({user});
@@ -45,6 +50,7 @@ exports.signup = async (req, res, next) => {
     }
 };
 
+//mail vide + mdp vide pour utilisateur suppr
 exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
@@ -61,6 +67,7 @@ exports.login = async (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
+          bio: user.bio,
           admin: user.admin,
           profilPic: user.profilPic
         },
@@ -92,6 +99,7 @@ exports.autoLogin = async (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        bio: user.bio,
         admin: user.admin,
         profilPic: user.profilPic
       },
@@ -129,4 +137,87 @@ exports.getOne = async (userId) => {
   } else {
     console.log("user not found");
   }
+};
+
+exports.getOneById = async (req, res, next) => {
+  console.log("getOneById user ");
+  const user = await User.findOne({ where: {id: req.body.id}});
+  if(user != undefined){
+    res.status(200).json({
+      user: {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        // email: user.email,
+        // admin: user.admin,
+        profilPic: user.profilPic
+      }
+    });
+  } else {
+    res.status(404).json({message:"User not found"});
+  }
+};
+
+exports.modifyBio = async (req, res, next) => {
+  console.log("params", req.params);
+  console.log("body", req.body);
+  let modification = {bio: req.body.bio};
+
+  try{
+    const bioModif = await User.update( modification, { where: { id: req.body.userId }});
+    console.log(bioModif);
+    console.log(modification);
+    res.status(200).json({message: "Biography modified successfully"});
+  } catch(err){
+    console.log("error modifyBio", err);
+    res.status(500).json({message:"There has been an error. Please, try again later."});
+  }
+
+};
+
+exports.modifyProfilPic = async (req, res, next) => {
+  console.log("modifyProfilPic");
+  console.log("WTF IS THAT");
+  console.log("req.body ", req.body);
+  console.log("req.params ", req.params);
+  console.log(req.file);
+
+  try{
+    let modification = {
+      profilPic: `${req.protocol}://${req.get('host')}/images/profil/${req.file.filename}`
+    };
+
+    const profilPicModif = await User.update( modification, { where: { id: req.params.userId }});
+    console.log(modification);
+    res.status(200).json({message: "Biography modified successfully", newProfilPic: modification.profilPic});
+  } catch(err){
+    console.log("error modifyprofilPic", err);
+    res.status(500).json({message:"There has been an error. Please, try again later. (modifyProfilPic)"});
+  }
+};
+
+exports.modifyPassword = async (req, res, next) => {
+  console.log("params pass", req.params);
+  console.log("body", req.body);
+  
+  let modification = {password: req.body.newPassword};
+  const user = await User.findByPk(req.body.userId, {raw: true});
+  console.log(user);
+
+  try{
+    //REPLACE WITH bcrypt
+    if( user.password == req.body.oldPassword ){
+      const pwdModif = await User.update( modification, { where: { id: req.body.userId }});
+      console.log(pwdModif);
+      console.log(modification);
+      res.status(200).json({message: "Password modified successfully"});
+    } else {
+      res.status(500).json({message:"The old password you entered was wrong."})
+    }
+
+  } catch(err){
+    console.log("error password", err);
+    res.status(500).json({message:"There has been an error. Please, try again later."});
+  }
+
 };

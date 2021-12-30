@@ -8,7 +8,13 @@ const MIME_TYPES = {
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, 'images');
+    let url = req.originalUrl;
+    console.log("URL", url);
+    if( url.includes("modifyProfilPic")){
+      callback(null, 'images/profil');
+    } else {
+      callback(null, 'images');
+    }
   },
   filename: (req, file, callback) => {
     const name = formatDate(Date.now());
