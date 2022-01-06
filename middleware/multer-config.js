@@ -11,9 +11,9 @@ const storage = multer.diskStorage({
     let url = req.originalUrl;
     console.log("URL", url);
     if( url.includes("modifyProfilPic")){
-      callback(null, 'images/profil');
+      callback(null, 'images/profils');
     } else {
-      callback(null, 'images');
+      callback(null, 'images/threads');
     }
   },
   filename: (req, file, callback) => {

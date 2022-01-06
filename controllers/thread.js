@@ -9,7 +9,7 @@ const Op = Sequelize.Op
 exports.create = async (req, res, next) => {
     // console.log("req.body", req.body);
     // console.log("req.file", req.file);
-    let img = req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null;
+    let img = req.file ? `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}` : null;
     //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
     const threadDatas = {
         ...req.body,
@@ -28,7 +28,7 @@ exports.getOne = async (req, res, next) => {
     const thread = await Thread.findOne({
          include : [{
                         model: User,
-                        attributes: [ 'firstName', 'lastName' ]
+                        attributes: [ 'firstName', 'lastName', 'id' ]
                   }
                   ,
                   {
@@ -57,7 +57,7 @@ exports.getAll = async (req, res, next) => {
         // }]
         include : [{
                         model: User,
-                        attributes: [ 'firstName', 'lastName' ]
+                        attributes: [ 'firstName', 'lastName','id' ]
                   }
                   ,
                   {
@@ -85,10 +85,14 @@ exports.getAll = async (req, res, next) => {
 };
 
 exports.getAllFromUser = async (req, res, next) => {
-    console.log("getAllFromUser");
+    console.log("getAllFromUser body", req.body);
+    console.log("getAllFromUser params", req.params);
+
+    let id = req.params.id ? req.params.id : req.body.userId;
+
     const threads = await Thread.findAll({
         where: {
-            userId: req.body.userId
+            userId: id
         },
         order: [
             ['id', 'DESC']
@@ -98,31 +102,36 @@ exports.getAllFromUser = async (req, res, next) => {
     return res.json(threads);
 }
 
-//SELECT * FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments JOIN users ON comments.userId = users.id WHERE users.id = 1)
-//SELECT threads.title FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments WHERE userId = 1)
-// inner join
 exports.getAllFromUserComments = async (req, res, next) => {
     console.log("getAllFromUserComments", req.body);
-    const results = await sequelize.query(
-        'SELECT * FROM threads WHERE threads.id IN ( SELECT comments.threadId FROM comments JOIN users ON comments.userId = users.id WHERE users.id = :id)',
-        {
-            replacements: { id: req.body.userId},
-            type: QueryTypes.SELECT
-        }
-    )
+    console.log("getAllFromUserComments params", req.params);
+    let id = req.params.id ? req.params.id : req.body.userId;
 
-    const results2 = await Comment.findAll({
-        include : [{
-                model: User,
-            }
+    const threads = await Thread.findAll({
+        attributes: [
+            ['id', 'threadId'], 'title'
         ],
+        include : [{
+                        model: User,
+                        attributes: [ 'firstName', 'lastName','id' ]
+                    },
+                    {
+                        model: Comment,
+                        attributes: []
+                    }
+        ],
+        where: {
+            '$comments.userId$': id
+        },
         order: [
             ['id', 'DESC']
-        ]
+        ],
+        group: [
+            'id'
+        ],
     });
-
-    console.log("coucou", results);
-    return res.json(results);
+    console.log(threads);
+    return res.json(threads);
 }
 
 exports.getCreator = async (userId) => {
@@ -138,31 +147,55 @@ exports.modify = async (req, res, next) => {
     let modification = {
         title: req.body.title,
         content: req.body.content,
-        image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        image: `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}`
     };
     console.log("modif", modification);
     const thread = await Thread.findByPk(req.params.id, { raw: true });
     console.log("modify thread", thread);
-    const threadModif = await Thread.update( modification, {
-        where: {
-            id: req.params.id
-        }
+ 
+    fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {
+        console.log(thread.image.split('/images/threads/')[1]);
+        
+        const threadModif = Thread.update( modification, {
+            where: {
+                id: req.params.id
+            }
+        });
+        console.log(threadModif);
     });
-    console.log(threadModif);
+    
     res.status(200).json({message: "Content modified successfully"});
 };
 
 exports.delete = async (req, res, next) => {
     console.log("delete");
+    console.log("params", req.params);
+    console.log("body", req.body);
+
     try{
-        const threadDelete =  await Thread.destroy({
+        const thread = await Thread.findOne({
             where: {
-            id: req.params.id
+                id: req.params.id
             }
         });
+        
+        fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {
+            console.log(thread.image.split('/images/threads/')[1]);
+            Thread.destroy({
+                where: {
+                    id: req.params.id
+                }
+            });
+        });
+
+        // const threadDelete =  await Thread.destroy({
+        //     where: {
+        //         id: req.params.id
+        //     }
+        // });
         res.status(200).json({message: "Thread deleted successfully"});
     } catch (error) {
-        res.status(400).json({message: "Error while deleting"});
+        res.status(400).json({message: "Error while deleting thread"});
     }
     
 };

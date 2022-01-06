@@ -12,7 +12,7 @@ exports.signup = async (req, res, next) => {
     console.log("coucou");
 
     //check mdp
-    req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profil/default_profil.png`; 
+    req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profils/default_profil.png`; 
 
     try{
       const user = await User.create({...req.body});
@@ -177,19 +177,37 @@ exports.modifyBio = async (req, res, next) => {
 
 exports.modifyProfilPic = async (req, res, next) => {
   console.log("modifyProfilPic");
-  console.log("WTF IS THAT");
-  console.log("req.body ", req.body);
-  console.log("req.params ", req.params);
-  console.log(req.file);
+  console.log("body", req.body);
+  console.log("params", req.params);
+  // console.log(req.file);
 
   try{
     let modification = {
-      profilPic: `${req.protocol}://${req.get('host')}/images/profil/${req.file.filename}`
+      profilPic: `${req.protocol}://${req.get('host')}/images/profils/${req.file.filename}`
     };
-
-    const profilPicModif = await User.update( modification, { where: { id: req.params.userId }});
     console.log(modification);
-    res.status(200).json({message: "Biography modified successfully", newProfilPic: modification.profilPic});
+
+    const user = await User.findByPk(req.body.userIdToModify, {raw: true });
+    console.log("user", user);
+    console.log("pic", user.profilPic.split('/images/profils/')[1]);
+    if(user.profilPic.split('/images/profils/')[1] == "default_profil.png"){
+      console.log("IF");
+      const profilPicModif = await User.update( modification, { where: { id: req.body.userIdToModify }});
+    } else {
+      console.log("ELSE");
+      fs.unlink(`images/profils/${user.profilPic.split('/images/profils/')[1]}`, () => {
+        console.log(user.profilPic.split('/images/profils/')[1]);
+        
+        const userModif = User.update( modification, {
+            where: {
+                id: req.body.userIdToModify
+            }
+        });
+        console.log(userModif);
+      });
+    }
+
+    res.status(200).json({message: "Profl pic modified successfully", newProfilPic: modification.profilPic});
   } catch(err){
     console.log("error modifyprofilPic", err);
     res.status(500).json({message:"There has been an error. Please, try again later. (modifyProfilPic)"});
@@ -220,4 +238,20 @@ exports.modifyPassword = async (req, res, next) => {
     res.status(500).json({message:"There has been an error. Please, try again later."});
   }
 
+};
+
+exports.delete = async (req, res, next) => {
+  console.log("delete user body", req.body);
+  console.log("delete user params", req.params);
+  
+  try{
+    await User.destroy({
+        where: {
+        id: req.params.id
+        }
+    });
+    res.status(200).json({message: "User deleted successfully"});
+  } catch (error) {
+    res.status(400).json({message: "Error while deleting user"});
+}
 };

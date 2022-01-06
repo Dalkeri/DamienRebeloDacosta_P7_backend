@@ -18,7 +18,7 @@ module.exports = async (req, res, next) => {
         console.log("next !!!!");
         next();
       } else {
-          throw new Error("You don't have the rights for that");
+          throw new Error("You don't have the rights for this action");
       }
     } else if( url.includes("comment") ) {
       const comment = await Comment.findOne({ where: { id: req.params.id } });
@@ -27,7 +27,14 @@ module.exports = async (req, res, next) => {
         console.log("next !!!!");
         next();
       } else {
-          throw new Error("You don't have the rights for that");
+        throw new Error("You don't have the rights for this action");
+      }
+    } else if(url.includes("user")){
+      const userToModify = await User.findOne({ where: { id: req.params.id }});
+      if(user.admin || user.id == userToModify.id){
+        next();
+      } else {
+        throw new Error("You don't have the rights for this action");
       }
     }
     
