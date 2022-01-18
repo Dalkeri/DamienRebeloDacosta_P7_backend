@@ -6,6 +6,7 @@ const Op = Sequelize.Op
 const jwt = require('jsonwebtoken');
 const { response } = require('../app');
 const { CONNREFUSED } = require('dns');
+const res = require('express/lib/response');
 
 exports.signup = async (req, res, next) => {
     console.log("req", req.body);
@@ -41,8 +42,7 @@ exports.signup = async (req, res, next) => {
         )
       });
     } catch (err) {
-      console.log("ERROR ");
-      console.log(err.errors);
+      console.log(err);
       if(err.errors[0].validatorKey == "not_unique") {
         return res.status(500).json({message: "Les emails doivent être unique"});
       }
@@ -54,14 +54,53 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
-  const user = await User.findOne({ where:  { email: req.body.email } });
-  console.log("USER : ", user);
-  if(user == null){
-    return res.status(500).json({message: "Informations de connexions incorrectes (user)"});
+  try{
+    const user = await User.findOne({ where:  { email: req.body.email } });
+    console.log("USER : ", user);
+
+    if(user == null){
+      return res.status(500).json({message: "Informations de connexions incorrectes."});
+    }
+
+    if(user.getDataValue('password') == req.body.password){
+        console.log("CONNECTED");
+        return res.status(200).json({
+          user: {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            bio: user.bio,
+            admin: user.admin,
+            profilPic: user.profilPic
+          },
+          token: jwt.sign(
+            { userId: user.id },
+            'USER_SECRET_TOKEN',
+            { expiresIn: '24h' }
+          )
+        });
+    } else {
+      console.log({error});
+      res.status(500).json({message: "Erreur lors de la connexion."});
+    }
+  } catch (error){
+    console.log({error});
+    res.status(500).json({message: "Erreur lors de la connexion."});
   }
-  if(user.getDataValue('password') == req.body.password){
+};
+
+exports.autoLogin = async (req, res, next) => {
+  console.log("autoLogin ", req.body);
+
+  try{
+    const user = await User.findOne({ where:  { id: req.body.userId } });
+    if(user == null){
+      res.status(404).json({message: "An error occured"});
+    } 
+    if( req.body.auto ){
       console.log("CONNECTED");
-      return res.status(200).json({
+      res.status(200).json({
         user: {
           id: user.id,
           firstName: user.firstName,
@@ -77,85 +116,40 @@ exports.login = async (req, res, next) => {
           { expiresIn: '24h' }
         )
       });
+    } else {
+      console.log("NOT CONNECTED");
+      res.status(500).json({message: "Echec de la connexion automatique."});
+    }
+  } catch (error){
+    console.log({error});
+    res.status(500).json({message: "Erreur lors de la connexion automatique."});
   }
-
-  console.log("NOT CONNECTED");
-  return res.status(500).json({message: "Informations de connexions incorrectes (mdp)"});
   
-};
-
-exports.autoLogin = async (req, res, next) => {
-  console.log("autoLogin ", req.body);
-  // console.log("decoded ", decodedToken);
-  const user = await User.findOne({ where:  { id: req.body.userId } });
-  if(user == null){
-    res.status(404).json({message: "An error occured"});
-  } 
-  if( req.body.auto ){
-    console.log("CONNECTED");
-    res.status(200).json({
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        bio: user.bio,
-        admin: user.admin,
-        profilPic: user.profilPic
-      },
-      token: jwt.sign(
-        { userId: user.id },
-        'USER_SECRET_TOKEN',
-        { expiresIn: '24h' }
-      )
-    });
-  } else {
-    console.log("NOT CONNECTED");
-    res.status(500).json({message: "An error occured"});
-}
-};
-
-exports.getOne = async (userId) => {
-  console.log("getOne user ", userId);
-  // const user = await User.findOne({ where: {id: userId}});
-  if(user != undefined){
-    res.status(200).json({
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        admin: user.admin,
-        profilPic: user.profilPic
-      },
-      token: jwt.sign(
-        { userId: user.id },
-        'USER_SECRET_TOKEN',
-        { expiresIn: '24h' }
-      )
-    });
-  } else {
-    console.log("user not found");
-  }
 };
 
 exports.getOneById = async (req, res, next) => {
   console.log("getOneById user ");
-  const user = await User.findOne({ where: {id: req.body.id}});
-  if(user != undefined){
-    res.status(200).json({
-      user: {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        // email: user.email,
-        // admin: user.admin,
-        profilPic: user.profilPic
-      }
-    });
-  } else {
-    res.status(404).json({message:"User not found"});
+  try{
+    const user = await User.findOne({ where: {id: req.body.id}});
+    if(user != undefined){
+      res.status(200).json({
+        user: {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          // email: user.email,
+          // admin: user.admin,
+          profilPic: user.profilPic
+        }
+      });
+    } else {
+      res.status(404).json({message:"Utilisateur non trouvé."});
+    }
+  }catch (error){
+    console.log({error});
+    res.status(500).json({message: "Erreur lors de la récupération."});
   }
+
 };
 
 exports.modifyBio = async (req, res, next) => {
@@ -169,8 +163,8 @@ exports.modifyBio = async (req, res, next) => {
     console.log(modification);
     res.status(200).json({message: "Biography modified successfully"});
   } catch(err){
-    console.log("error modifyBio", err);
-    res.status(500).json({message:"There has been an error. Please, try again later."});
+    console.log({error});
+    res.status(500).json({message:"Erreur lors de la modification."});
   }
 
 };
@@ -209,8 +203,8 @@ exports.modifyProfilPic = async (req, res, next) => {
 
     res.status(200).json({message: "Profl pic modified successfully", newProfilPic: modification.profilPic});
   } catch(err){
-    console.log("error modifyprofilPic", err);
-    res.status(500).json({message:"There has been an error. Please, try again later. (modifyProfilPic)"});
+    console.log({error});
+    res.status(500).json({message:"Erreur lors de la modification."});
   }
 };
 
@@ -230,12 +224,12 @@ exports.modifyPassword = async (req, res, next) => {
       console.log(modification);
       res.status(200).json({message: "Password modified successfully"});
     } else {
-      res.status(500).json({message:"The old password you entered was wrong."})
+      res.status(500).json({message:"L'ancien mot de passe est incorrect."})
     }
 
   } catch(err){
-    console.log("error password", err);
-    res.status(500).json({message:"There has been an error. Please, try again later."});
+    console.log({error});
+    res.status(500).json({message:"Erreur lors de la modification."});
   }
 
 };
@@ -245,6 +239,22 @@ exports.delete = async (req, res, next) => {
   console.log("delete user params", req.params);
   
   try{
+    userToDelete = await User.findOne({
+                                where: {
+                                  id: req.params.id
+                                }
+                              });
+
+    console.log(userToDelete);
+    console.log(userToDelete.profilPic.split('/images/profils/')[1]);
+    console.log( userToDelete.profilPic.split('/images/profils/')[1] != "default_profil.png");
+    if( userToDelete.profilPic.split('/images/profils/')[1] != "default_profil.png"){
+      console.log("dans le if");
+      fs.unlink(`images/profils/${userToDelete.profilPic.split('/images/profils/')[1]}`, () => {
+        console.log("delete profil pic");
+      });
+    }
+
     await User.destroy({
         where: {
         id: req.params.id
@@ -252,6 +262,7 @@ exports.delete = async (req, res, next) => {
     });
     res.status(200).json({message: "User deleted successfully"});
   } catch (error) {
-    res.status(400).json({message: "Error while deleting user"});
+    console.log({error});
+    res.status(400).json({message: "Erreur lors de la suppression."});
 }
 };
