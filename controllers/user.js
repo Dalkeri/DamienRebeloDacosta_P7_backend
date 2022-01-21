@@ -137,6 +137,7 @@ exports.getOneById = async (req, res, next) => {
           id: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
+          bio: user.bio,
           // email: user.email,
           // admin: user.admin,
           profilPic: user.profilPic
@@ -158,7 +159,7 @@ exports.modifyBio = async (req, res, next) => {
   let modification = {bio: req.body.bio};
 
   try{
-    const bioModif = await User.update( modification, { where: { id: req.body.userId }});
+    const bioModif = await User.update( modification, { where: { id: req.params.id }});
     console.log(bioModif);
     console.log(modification);
     res.status(200).json({message: "Biography modified successfully"});

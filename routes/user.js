@@ -17,7 +17,7 @@ router.post('/login', userCtrl.login);
 router.post("/autoLogin", auth, userCtrl.autoLogin);
 
 //TODO put
-router.post("/modifyBio", auth, userCtrl.modifyBio);//add hasRights
+router.post("/:id/modifyBio", auth, userCtrl.modifyBio);//add hasRights
 router.post("/modifyPassword", auth, userCtrl.modifyPassword);//add hasRights
 router.post("/modifyProfilPic", auth, multer, userCtrl.modifyProfilPic);//add hasRights
 router.delete('/:id', auth, hasRights, userCtrl.delete); //add hasRights
