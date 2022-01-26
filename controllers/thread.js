@@ -4,12 +4,16 @@ const fs = require('fs');
 
 const Op = Sequelize.Op
 
-// console.log("thread controller", Thread);
-
 exports.create = async (req, res, next) => {
-
+    //TODO vérification qu'on a bien un titre minimum
+    // si pas de content on met '' 
+    console.log("CREATE", req.body);
     try{
         let img = req.file ? `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}` : null;
+
+        if(!req.body.title){
+            res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
+        }
         //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
         const threadDatas = {
             ...req.body,
@@ -111,7 +115,7 @@ exports.modify = async (req, res, next) => {
         console.log("modify thread", thread);
     
         let updatedThread;
-        if(req.file || req.body.deletePic) {
+        if( (req.file || req.body.deletePic) && thread.image) {
             fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {
                 console.log(thread.image.split('/images/threads/')[1]);
                 

@@ -219,14 +219,14 @@ exports.modifyPassword = async (req, res, next) => {
 
   try{
     //REPLACE WITH bcrypt
-    if( user.password == req.body.oldPassword ){
+    // if( user.password == req.body.oldPassword ){
       const pwdModif = await User.update( modification, { where: { id: req.body.userId }});
       console.log(pwdModif);
       console.log(modification);
-      res.status(200).json({message: "Password modified successfully"});
-    } else {
-      res.status(500).json({message:"L'ancien mot de passe est incorrect."})
-    }
+      res.status(200).json({message: "Password modifié."});
+    // } else {
+    //   res.status(500).json({message:"L'ancien mot de passe est incorrect."})
+    // }
 
   } catch(err){
     console.log({error});
