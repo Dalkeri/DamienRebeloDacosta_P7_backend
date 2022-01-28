@@ -60,16 +60,19 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
-  try{
-    const user = await User.findOne({ where:  { email: req.body.email } });
-    console.log("USER : ", user);
 
-    if(user == null){
-      return res.status(500).json({message: "Informations de connexions incorrectes."});
-    }
-    
-    // if(user.getDataValue('password') == req.body.password){
-    if(bcrypt.compare(req.body.password, user.password)){
+  const user = await User.findOne({ where:  { email: req.body.email } });
+  console.log("USER : ", user);
+
+  if(user == null){
+    return res.status(500).json({message: "Mauvais email ou mot de passe."});
+  }
+  
+  bcrypt.compare(req.body.password, user.password)
+    .then( valid => {
+      if(!valid){
+        return res.status(401).json({message: "Mauvais email ou mot de passe."})
+      } else {
         console.log("CONNECTED");
         return res.status(200).json({
           user: {
@@ -87,14 +90,13 @@ exports.login = async (req, res, next) => {
             { expiresIn: '24h' }
           )
         });
-    } else {
+      }
+    })
+    .catch( error => {
       console.log({error});
       res.status(500).json({message: "Erreur lors de la connexion."});
-    }
-  } catch (error){
-    console.log({error});
-    res.status(500).json({message: "Erreur lors de la connexion."});
-  }
+    });
+    
 };
 
 exports.autoLogin = async (req, res, next) => {

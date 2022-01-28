@@ -21,7 +21,7 @@ exports.create = async (req, res, next) => {
         }
 
         console.log(commentToAdd);
-        res.status(200).json(commentToAdd);
+        return res.status(200).json(commentToAdd);
     } catch (error) {
         console.log({error});
         res.status(500).json({message: "Erreur lors de la création."});
@@ -71,7 +71,7 @@ exports.modify = async (req, res, next) => {
         console.log("modify comment", comment);
 
         if(!comment){
-            return res.status(404).json({message: "Comment not found"});
+            res.status(404).json({message: "Comment not found"});
         }
     
         const commentModif = await Comment.update( modification, {

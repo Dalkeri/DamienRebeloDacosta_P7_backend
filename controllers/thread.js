@@ -12,19 +12,19 @@ exports.create = async (req, res, next) => {
         let img = req.file ? `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}` : null;
 
         if(!req.body.title){
-            res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
+            return res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
         }
-        //check si on a du texte et / ou une image mais erreur si ni l'un ni l'autre
+
         const threadDatas = {
             ...req.body,
             image: img
         }
         const thread = await Thread.create(threadDatas);
         console.log(thread);
-        res.status(200).json({thread});    
+        return res.status(200).json({thread});    
     } catch (error){
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la création."});
+        return res.status(500).json({message: "Erreur lors de la création."});
     }
 };
 
@@ -53,7 +53,7 @@ exports.getOne = async (req, res, next) => {
        return res.json(thread);
     } catch (error){
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la récupération."});
+        return res.status(500).json({message: "Erreur lors de la récupération."});
     }
 
 };
@@ -63,12 +63,6 @@ exports.getAll = async (req, res, next) => {
 
     try {
         const threads = await Thread.findAll({
-            // include: [{
-            //     model: User,
-            //     through: {
-            //         attributes: [ 'firstName', 'lastName' ]
-            //     }
-            // }]
             include : [{
                             model: User,
                             attributes: [ 'firstName', 'lastName','id' ]
@@ -89,7 +83,7 @@ exports.getAll = async (req, res, next) => {
         
     } catch (error){
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la récupération."});
+        return res.status(500).json({message: "Erreur lors de la récupération des données."});
     }
  
 };
@@ -99,6 +93,10 @@ exports.modify = async (req, res, next) => {
     console.log(req.file);
     console.log("modify body", req.body);
     console.log("modify params", req.params);
+
+    if(!req.body.title){
+        return res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
+    }
 
     let modification = {
         title: req.body.title,
@@ -134,11 +132,11 @@ exports.modify = async (req, res, next) => {
             });
         }
     
-        res.status(200).json({message: "Content modified successfully"});
+        return res.status(200).json({message: "Content modified successfully"});
 
     } catch (error) {
             console.log({error});
-            res.status(500).json({message: "Erreur lors de la modification."});
+            return res.status(500).json({message: "Erreur lors de la modification."});
     } 
     
 };
@@ -172,10 +170,10 @@ exports.delete = async (req, res, next) => {
             });
         }
 
-        res.status(200).json({message: "Thread deleted successfully"});
+        return res.status(200).json({message: "Poste supprimé avec succès."});
     } catch (error) {
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la suppression."});
+        return res.status(500).json({message: "Erreur lors de la suppression."});
     }
     
 };
