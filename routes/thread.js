@@ -10,10 +10,10 @@ const threadCtrl = require('../controllers/thread');
 
 router.post('/create', auth, multer, threadCtrl.create);
 //add auth 
-router.get('/:id', threadCtrl.getOne);
-router.get('/', threadCtrl.getAll);
-router.delete('/:id', auth, threadCtrl.delete); //add hasRights
-router.put('/modify/:id', auth, hasRights, multer, threadCtrl.modify);
+router.get('/:id', auth, threadCtrl.getOne);
+router.get('/', auth, threadCtrl.getAll);
+router.delete('/:id', auth, hasRights, threadCtrl.delete); 
+router.put('/:id/modify/', auth, hasRights, multer, threadCtrl.modify);
 
 // router.post('/:id/likes', threadCtrl.likes);
 

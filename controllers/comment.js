@@ -69,6 +69,10 @@ exports.modify = async (req, res, next) => {
         console.log("modif", modification);
         const comment = await Comment.findByPk(req.params.id, { raw: true });
         console.log("modify comment", comment);
+
+        if(!comment){
+            return res.status(404).json({message: "Comment not found"});
+        }
     
         const commentModif = await Comment.update( modification, {
                                                         where: {
@@ -76,18 +80,14 @@ exports.modify = async (req, res, next) => {
                                                         }
                                                     });
         console.log(commentModif);
-        const user = await User.findByPk(req.body.userId, {raw: true });
-    
+                                                    
         const modifiedComment = {
             id: comment.id,
             threadId: comment.threadId,
             content: req.body.content,
-            User: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                id: user.id
-            }
+ 
         }
+        console.log(modifiedComment);
         res.status(200).json(modifiedComment);
     } catch (error){
         console.log({error});

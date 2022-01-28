@@ -15,13 +15,13 @@ exports.signup = async (req, res, next) => {
     //check mdp
     req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profils/default_profil.png`; 
 
-    // let mailFormat = `^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$`;
-    // console.log(req.body.email);
-    // console.log(mailFormat);
-    // console.log(req.body.email.match(mailFormat));
-    // if( !req.body.email.match(mailFormat)){
-    //   return res.status(401).json({message: "Le format de l'email est incorrect."});
-    // }
+    let mailFormat = `^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$`;
+    console.log(req.body.email);
+    console.log(mailFormat);
+    console.log(req.body.email.match(mailFormat));
+    if( !req.body.email.match(mailFormat)){
+      return res.status(401).json({message: "Le format de l'email est incorrect."});
+    }
     
     try{
       
@@ -57,7 +57,6 @@ exports.signup = async (req, res, next) => {
     }
 };
 
-//mail vide + mdp vide pour utilisateur suppr
 exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
@@ -190,7 +189,7 @@ exports.modifyProfilPic = async (req, res, next) => {
     };
     console.log(modification);
 
-    const user = await User.findByPk(req.params.id, {raw: true }); //req.body.userIdToModify
+    const user = await User.findByPk(req.params.id, {raw: true });
     console.log("user", user);
     console.log("pic", user.profilPic.split('/images/profils/')[1]);
     if(user.profilPic.split('/images/profils/')[1] == "default_profil.png"){
@@ -204,7 +203,7 @@ exports.modifyProfilPic = async (req, res, next) => {
             id: req.params.id
         }
       });
-      
+
       fs.unlink(`images/profils/${user.profilPic.split('/images/profils/')[1]}`, () => {
         console.log(user.profilPic.split('/images/profils/')[1]);
       });
@@ -221,7 +220,6 @@ exports.modifyPassword = async (req, res, next) => {
   console.log("params pass", req.params);
   console.log("body", req.body);
   
-  // let modification = {password: req.body.newPassword};
   const user = await User.findByPk(req.body.userId, {raw: true});
   console.log(user);
 
