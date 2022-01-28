@@ -7,40 +7,47 @@ const jwt = require('jsonwebtoken');
 const { response } = require('../app');
 const { CONNREFUSED } = require('dns');
 const res = require('express/lib/response');
+const bcrypt = require('bcrypt');
 
 exports.signup = async (req, res, next) => {
     console.log("req", req.body);
-    console.log("coucou");
 
     //check mdp
     req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profils/default_profil.png`; 
 
+    // let mailFormat = `^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$`;
+    // console.log(req.body.email);
+    // console.log(mailFormat);
+    // console.log(req.body.email.match(mailFormat));
+    // if( !req.body.email.match(mailFormat)){
+    //   return res.status(401).json({message: "Le format de l'email est incorrect."});
+    // }
+    
     try{
-      const user = await User.create({...req.body});
-      console.log({user});
-      // token: jwt.sign(
-      //   { userId: user.id },
-      //   'USER_SECRET_TOKEN',
-      //   { expiresIn: '24h' }
-      // )
-      // res.status(201).json({message: "Utilisateur créé"});
-      console.log(user.dataValues.id);
-      return res.status(201).json({
-        // TODO: create function to do that
-        user: { 
-          id: user.dataValues.id,
-          firstName: user.dataValues.firstName,
-          lastName: user.dataValues.lastName,
-          email: user.dataValues.email,
-          admin: user.vadmin,
-          profilPic: user.dataValues.profilPic
-        },
-        token: jwt.sign(
-          { userId: user.id },
-          'USER_SECRET_TOKEN',
-          { expiresIn: '24h' }
-        )
-      });
+      
+      bcrypt.hash(req.body.password, 10)
+        .then( async (hash) => {                                  //TODO, see here
+          req.body.password = hash;
+          console.log(req.body);
+          const user = await User.create({...req.body});
+          return res.status(201).json({
+            user: { 
+              id: user.dataValues.id,
+              firstName: user.dataValues.firstName,
+              lastName: user.dataValues.lastName,
+              email: user.dataValues.email,
+              admin: user.vadmin,
+              profilPic: user.dataValues.profilPic
+            },
+            token: jwt.sign(
+              { userId: user.id },
+              'USER_SECRET_TOKEN', //TODO in .env
+              { expiresIn: '24h' }
+            )
+          });
+        })
+        .catch(error => res.status(500).json({message:" 1 Erreur lors de l'inscription."}))
+     
     } catch (err) {
       console.log(err);
       if(err.errors[0].validatorKey == "not_unique") {
@@ -61,8 +68,9 @@ exports.login = async (req, res, next) => {
     if(user == null){
       return res.status(500).json({message: "Informations de connexions incorrectes."});
     }
-
-    if(user.getDataValue('password') == req.body.password){
+    
+    // if(user.getDataValue('password') == req.body.password){
+    if(bcrypt.compare(req.body.password, user.password)){
         console.log("CONNECTED");
         return res.status(200).json({
           user: {
@@ -182,23 +190,23 @@ exports.modifyProfilPic = async (req, res, next) => {
     };
     console.log(modification);
 
-    const user = await User.findByPk(req.body.userIdToModify, {raw: true });
+    const user = await User.findByPk(req.params.id, {raw: true }); //req.body.userIdToModify
     console.log("user", user);
     console.log("pic", user.profilPic.split('/images/profils/')[1]);
     if(user.profilPic.split('/images/profils/')[1] == "default_profil.png"){
       console.log("IF");
-      const profilPicModif = await User.update( modification, { where: { id: req.body.userIdToModify }});
+      const profilPicModif = await User.update( modification, { where: { id: req.params.id }});
     } else {
       console.log("ELSE");
+
+      const userModif = User.update( modification, {
+        where: {
+            id: req.params.id
+        }
+      });
+      
       fs.unlink(`images/profils/${user.profilPic.split('/images/profils/')[1]}`, () => {
         console.log(user.profilPic.split('/images/profils/')[1]);
-        
-        const userModif = User.update( modification, {
-            where: {
-                id: req.body.userIdToModify
-            }
-        });
-        console.log(userModif);
       });
     }
 
@@ -213,25 +221,17 @@ exports.modifyPassword = async (req, res, next) => {
   console.log("params pass", req.params);
   console.log("body", req.body);
   
-  let modification = {password: req.body.newPassword};
+  // let modification = {password: req.body.newPassword};
   const user = await User.findByPk(req.body.userId, {raw: true});
   console.log(user);
 
-  try{
-    //REPLACE WITH bcrypt
-    // if( user.password == req.body.oldPassword ){
-      const pwdModif = await User.update( modification, { where: { id: req.body.userId }});
-      console.log(pwdModif);
-      console.log(modification);
-      res.status(200).json({message: "Password modifié."});
-    // } else {
-    //   res.status(500).json({message:"L'ancien mot de passe est incorrect."})
-    // }
+    bcrypt.hash(req.body.newPassword, 10)
+      .then( async(hash) => {
+        const pwdModif = await User.update( {password: hash} , { where: { id: req.params.id }});
 
-  } catch(err){
-    console.log({error});
-    res.status(500).json({message:"Erreur lors de la modification."});
-  }
+        res.status(200).json({message: "Password modifié."});
+      })
+      .catch( error => res.status(500).json({message:"Erreur lors de la modification."}));
 
 };
 
