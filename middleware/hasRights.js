@@ -37,7 +37,7 @@ module.exports = async (req, res, next) => {
     
     
   } catch {
-    res.status(401).json({
+    return res.status(401).json({
     //   error: new Error('Invalid request!'),
       message: "You don't have rights to do that"
     });

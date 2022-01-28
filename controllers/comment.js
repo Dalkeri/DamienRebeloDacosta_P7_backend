@@ -24,7 +24,7 @@ exports.create = async (req, res, next) => {
         return res.status(200).json(commentToAdd);
     } catch (error) {
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la création."});
+        return res.status(500).json({message: "Erreur lors de la création."});
     }
    
 };
@@ -71,7 +71,7 @@ exports.modify = async (req, res, next) => {
         console.log("modify comment", comment);
 
         if(!comment){
-            res.status(404).json({message: "Comment not found"});
+            return res.status(404).json({message: "Comment not found"});
         }
     
         const commentModif = await Comment.update( modification, {
@@ -88,10 +88,10 @@ exports.modify = async (req, res, next) => {
  
         }
         console.log(modifiedComment);
-        res.status(200).json(modifiedComment);
+        return res.status(200).json(modifiedComment);
     } catch (error){
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la modification."})
+        return res.status(500).json({message: "Erreur lors de la modification."})
     }
 
 };
@@ -104,9 +104,9 @@ exports.delete = async (req, res, next) => {
             id: req.params.id
             }
         });
-        res.status(200).json({message: "Comment deleted successfully"});
+        return res.status(200).json({message: "Comment deleted successfully"});
     } catch (error) {
         console.log({error});
-        res.status(500).json({message: "Erreur lors de la suppression."});
+        return res.status(500).json({message: "Erreur lors de la suppression."});
     }
 };

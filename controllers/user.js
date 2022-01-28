@@ -65,7 +65,7 @@ exports.login = async (req, res, next) => {
   console.log("USER : ", user);
 
   if(user == null){
-    return res.status(500).json({message: "Mauvais email ou mot de passe."});
+    return (500).json({message: "Mauvais email ou mot de passe."});
   }
   
   bcrypt.compare(req.body.password, user.password)
@@ -94,7 +94,7 @@ exports.login = async (req, res, next) => {
     })
     .catch( error => {
       console.log({error});
-      res.status(500).json({message: "Erreur lors de la connexion."});
+      return res.status(500).json({message: "Erreur lors de la connexion."});
     });
     
 };
@@ -105,11 +105,11 @@ exports.autoLogin = async (req, res, next) => {
   try{
     const user = await User.findOne({ where:  { id: req.body.userId } });
     if(user == null){
-      res.status(404).json({message: "An error occured"});
+      return res.status(404).json({message: "An error occured"});
     } 
     if( req.body.auto ){
       console.log("CONNECTED");
-      res.status(200).json({
+      return res.status(200).json({
         user: {
           id: user.id,
           firstName: user.firstName,
@@ -127,11 +127,11 @@ exports.autoLogin = async (req, res, next) => {
       });
     } else {
       console.log("NOT CONNECTED");
-      res.status(500).json({message: "Echec de la connexion automatique."});
+      return res.status(500).json({message: "Echec de la connexion automatique."});
     }
   } catch (error){
     console.log({error});
-    res.status(500).json({message: "Erreur lors de la connexion automatique."});
+    return res.status(500).json({message: "Erreur lors de la connexion automatique."});
   }
   
 };
@@ -141,7 +141,7 @@ exports.getOneById = async (req, res, next) => {
   try{
     const user = await User.findOne({ where: {id: req.body.id}});
     if(user != undefined){
-      res.status(200).json({
+      return res.status(200).json({
         user: {
           id: user.id,
           firstName: user.firstName,
@@ -153,11 +153,11 @@ exports.getOneById = async (req, res, next) => {
         }
       });
     } else {
-      res.status(404).json({message:"Utilisateur non trouvé."});
+      return res.status(404).json({message:"Utilisateur non trouvé."});
     }
   }catch (error){
     console.log({error});
-    res.status(500).json({message: "Erreur lors de la récupération."});
+    return res.status(500).json({message: "Erreur lors de la récupération."});
   }
 
 };
@@ -171,10 +171,10 @@ exports.modifyBio = async (req, res, next) => {
     const bioModif = await User.update( modification, { where: { id: req.params.id }});
     console.log(bioModif);
     console.log(modification);
-    res.status(200).json({message: "Biography modified successfully"});
+    return res.status(200).json({message: "Biography modified successfully"});
   } catch(err){
     console.log({error});
-    res.status(500).json({message:"Erreur lors de la modification."});
+    return res.status(500).json({message:"Erreur lors de la modification."});
   }
 
 };
@@ -211,10 +211,10 @@ exports.modifyProfilPic = async (req, res, next) => {
       });
     }
 
-    res.status(200).json({message: "Profl pic modified successfully", newProfilPic: modification.profilPic});
+    return res.status(200).json({message: "Profl pic modified successfully", newProfilPic: modification.profilPic});
   } catch(err){
     console.log({error});
-    res.status(500).json({message:"Erreur lors de la modification."});
+    return res.status(500).json({message:"Erreur lors de la modification."});
   }
 };
 
@@ -229,7 +229,7 @@ exports.modifyPassword = async (req, res, next) => {
       .then( async(hash) => {
         const pwdModif = await User.update( {password: hash} , { where: { id: req.params.id }});
 
-        res.status(200).json({message: "Password modifié."});
+        return res.status(200).json({message: "Password modifié."});
       })
       .catch( error => res.status(500).json({message:"Erreur lors de la modification."}));
 
@@ -261,9 +261,9 @@ exports.delete = async (req, res, next) => {
         id: req.params.id
         }
     });
-    res.status(200).json({message: "User deleted successfully"});
+    return res.status(200).json({message: "User deleted successfully"});
   } catch (error) {
     console.log({error});
-    res.status(400).json({message: "Erreur lors de la suppression."});
+    return res.status(400).json({message: "Erreur lors de la suppression."});
 }
 };
