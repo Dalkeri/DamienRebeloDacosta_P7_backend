@@ -1,7 +1,7 @@
 # backend
 
 This project is a MVP for a social media website.
-This backend has been made with nodeJS and Sequelize. You can plug in your database but I already included models and migrations so you can typing the command 
+This backend has been made with nodeJS and Sequelize. You can plug in your database but I already included models and migrations so you can type the command 
 ```
 npx sequelize-cli db:migrate
 ```
