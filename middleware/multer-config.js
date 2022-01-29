@@ -9,7 +9,8 @@ const MIME_TYPES = {
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     let url = req.originalUrl;
-    console.log("URL", url);
+    
+    //we have to check either it's a profilPic or a thread image
     if( url.includes("modifyProfilPic")){
       callback(null, 'images/profils');
     } else {

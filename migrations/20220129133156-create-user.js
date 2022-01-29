@@ -1,33 +1,36 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Threads', {
+    await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      title: {
+      firstName: {
         type: Sequelize.STRING
       },
-      content: {
-        type: Sequelize.TEXT
-      },
-      image: {
+      lastName: {
         type: Sequelize.STRING
       },
-      visible: {
-        type: Sequelize.BOOLEAN
+      email: {
+        type: Sequelize.STRING,
+        unique: true
       },
-      userId: {
-        type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
-        references: {
-          model: 'Users',
-          key: 'id',
-          as: 'userId',
-        }
+      password: {
+        type: Sequelize.STRING
+      },
+      bio: {
+        type: Sequelize.STRING,
+        default: ""
+      },
+      admin: {
+        type: Sequelize.BOOLEAN,
+        default: false
+      },
+      profilPic: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -40,6 +43,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Threads');
+    await queryInterface.dropTable('Users');
   }
 };

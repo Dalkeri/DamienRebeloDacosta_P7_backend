@@ -1,11 +1,5 @@
-test/
-test.js
 test.rest
-database.js
-Models/test.js
 node_modules/
-Untitled-1.ini
-bidule.js
 images/profils/*
 !images/profils/default_profil.png
 images/threads/*

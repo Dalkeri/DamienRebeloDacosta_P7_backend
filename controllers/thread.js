@@ -5,9 +5,6 @@ const fs = require('fs');
 const Op = Sequelize.Op
 
 exports.create = async (req, res, next) => {
-    //TODO vérification qu'on a bien un titre minimum
-    // si pas de content on met '' 
-    console.log("CREATE", req.body);
     try{
         let img = req.file ? `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}` : null;
 
@@ -20,7 +17,6 @@ exports.create = async (req, res, next) => {
             image: img
         }
         const thread = await Thread.create(threadDatas);
-        console.log(thread);
         return res.status(200).json({thread});    
     } catch (error){
         console.log({error});
@@ -29,8 +25,6 @@ exports.create = async (req, res, next) => {
 };
 
 exports.getOne = async (req, res, next) => {
-    console.log("getOne", req.params);
-    //findByPK
     try{
         const thread = await Thread.findOne({
             include : [{
@@ -49,7 +43,6 @@ exports.getOne = async (req, res, next) => {
            }
        });
    
-       // console.log(thread);
        return res.json(thread);
     } catch (error){
         console.log({error});
@@ -59,8 +52,6 @@ exports.getOne = async (req, res, next) => {
 };
 
 exports.getAll = async (req, res, next) => {
-    console.log("getAll", Thread);
-
     try {
         const threads = await Thread.findAll({
             include : [{
@@ -71,7 +62,7 @@ exports.getAll = async (req, res, next) => {
                       {
                           model: Comment,
                           attributes: [ 'id', 'content', 'userId', 'threadId'],
-                          include: [{ model: User, attributes: [ 'firstName', 'lastName']}]
+                          include: [{ model: User, attributes: [ 'firstName', 'lastName', 'id']}]
                       }
             ],
             order: [
@@ -80,7 +71,6 @@ exports.getAll = async (req, res, next) => {
         });
     
         return res.json(threads);
-        
     } catch (error){
         console.log({error});
         return res.status(500).json({message: "Erreur lors de la récupération des données."});
@@ -88,12 +78,7 @@ exports.getAll = async (req, res, next) => {
  
 };
 
-//pas { modification }   ???
 exports.modify = async (req, res, next) => {
-    console.log(req.file);
-    console.log("modify body", req.body);
-    console.log("modify params", req.params);
-
     if(!req.body.title){
         return res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
     }
@@ -102,30 +87,26 @@ exports.modify = async (req, res, next) => {
         title: req.body.title,
         content: req.body.content,
     };
+
     try{
         if(req.file){
             modification.image = `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}`;
         } else if(req.body.deletePic){
             modification.image = "";
         }
-        console.log("modif", modification);
+
         const thread = await Thread.findByPk(req.params.id, { raw: true });
-        console.log("modify thread", thread);
     
-        let updatedThread;
         if( (req.file || req.body.deletePic) && thread.image) {
-            fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {
-                console.log(thread.image.split('/images/threads/')[1]);
-                
+            fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {                
                 const threadModif = Thread.update( modification, {
                     where: {
                         id: req.params.id
                     }
                 });
-                console.log(threadModif);
             });
         } else {
-            updatedThread = Thread.update( modification, {
+            let updatedThread = Thread.update( modification, {
                 where: {
                     id: req.params.id
                 }
@@ -133,19 +114,13 @@ exports.modify = async (req, res, next) => {
         }
     
         return res.status(200).json({message: "Content modified successfully"});
-
     } catch (error) {
-            console.log({error});
-            return res.status(500).json({message: "Erreur lors de la modification."});
+        console.log({error});
+        return res.status(500).json({message: "Erreur lors de la modification."});
     } 
-    
 };
 
 exports.delete = async (req, res, next) => {
-    console.log("delete");
-    console.log("params", req.params);
-    console.log("body", req.body);
-
     try{
         const thread = await Thread.findOne({
             where: {
@@ -155,7 +130,6 @@ exports.delete = async (req, res, next) => {
         
         if(thread.image){
             fs.unlink(`images/threads/${thread.image.split('/images/threads/')[1]}`, () => {
-                console.log(thread.image.split('/images/threads/')[1]);
                 Thread.destroy({
                     where: {
                         id: req.params.id
@@ -175,5 +149,4 @@ exports.delete = async (req, res, next) => {
         console.log({error});
         return res.status(500).json({message: "Erreur lors de la suppression."});
     }
-    
 };
