@@ -5,6 +5,7 @@ const bodyParser =  require('body-parser');
 const userRoutes = require('./routes/user');
 const threadRoutes = require('./routes/thread');
 const commentRoutes = require('./routes/comment');
+require('dotenv').config();
 // const likeRoutes = require('./routes/like');
 
 // const db = require('./models/index');

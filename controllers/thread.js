@@ -12,7 +12,7 @@ exports.create = async (req, res, next) => {
         let img = req.file ? `${req.protocol}://${req.get('host')}/images/threads/${req.file.filename}` : null;
 
         if(!req.body.title){
-            return res.status(500).json({message: "Le poste doit contenir un titre obligatoirement."})
+            return res.status(401).json({message: "Le poste doit contenir un titre obligatoirement."})
         }
 
         const threadDatas = {

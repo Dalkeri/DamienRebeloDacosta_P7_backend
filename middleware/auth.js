@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
     const token = req.headers.authorization.split(' ')[1];
     // console.log("token ", token);
     // console.log("req.body", req.body);
-    const decodedToken = jwt.verify(token, "USER_SECRET_TOKEN");
+    const decodedToken = jwt.verify(token, process.env.SECRET_PHRASE);
     //check que le token est bon et pas expiré
 
     console.log("decodedToken ",decodedToken);
@@ -18,8 +18,8 @@ module.exports = (req, res, next) => {
     // if(req.body.auto){
     req.body.userId = decodedToken.userId;
     req.params.userId = decodedToken.userId;
-    console.log("req.body ",req.body);
-    console.log("req.params ",req.params);
+    // console.log("req.body ",req.body);
+    // console.log("req.params ",req.params);
 
     // }
     // if( !req.body.auto ) { 

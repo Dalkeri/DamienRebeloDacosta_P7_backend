@@ -4,9 +4,8 @@ const fs = require('fs');
 const Op = Sequelize.Op
 
 const jwt = require('jsonwebtoken');
-const { response } = require('../app');
-const { CONNREFUSED } = require('dns');
-const res = require('express/lib/response');
+// const { response } = require('../app');
+// const res = require('express/lib/response');
 const bcrypt = require('bcrypt');
 
 exports.signup = async (req, res, next) => {
@@ -16,17 +15,16 @@ exports.signup = async (req, res, next) => {
     req.body.profilPic = `${req.protocol}://${req.get('host')}/images/profils/default_profil.png`; 
 
     let mailFormat = `^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$`;
-    console.log(req.body.email);
-    console.log(mailFormat);
-    console.log(req.body.email.match(mailFormat));
+    // console.log(req.body.email);
+    // console.log(mailFormat);
+    // console.log(req.body.email.match(mailFormat));
     if( !req.body.email.match(mailFormat)){
       return res.status(401).json({message: "Le format de l'email est incorrect."});
     }
     
     try{
-      
       bcrypt.hash(req.body.password, 10)
-        .then( async (hash) => {                                  //TODO, see here
+        .then( async (hash) => {       
           req.body.password = hash;
           console.log(req.body);
           const user = await User.create({...req.body});
@@ -41,7 +39,7 @@ exports.signup = async (req, res, next) => {
             },
             token: jwt.sign(
               { userId: user.id },
-              'USER_SECRET_TOKEN', //TODO in .env
+              process.env.SECRET_PHRASE, //TODO in .env
               { expiresIn: '24h' }
             )
           });
@@ -60,7 +58,6 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   console.log("req.body", req.body);
   // console.log("USER", User);
-
   const user = await User.findOne({ where:  { email: req.body.email } });
   console.log("USER : ", user);
 
@@ -86,7 +83,7 @@ exports.login = async (req, res, next) => {
           },
           token: jwt.sign(
             { userId: user.id },
-            'USER_SECRET_TOKEN',
+            process.env.SECRET_PHRASE,
             { expiresIn: '24h' }
           )
         });
@@ -121,7 +118,7 @@ exports.autoLogin = async (req, res, next) => {
         },
         token: jwt.sign(
           { userId: user.id },
-          'USER_SECRET_TOKEN',
+          process.env.SECRET_PHRASE,
           { expiresIn: '24h' }
         )
       });
