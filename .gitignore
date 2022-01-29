@@ -3,3 +3,4 @@ node_modules/
 images/profils/*
 !images/profils/default_profil.png
 images/threads/*
+!images/threads/default_profil.png
