@@ -9,7 +9,7 @@ it should work too.
 
 
 ## Project setup
-Uou'll need npm so you can install everything needed with this command
+You'll need npm so you can install everything needed with this command
 ```
 npm install
 ```
