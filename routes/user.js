@@ -6,7 +6,7 @@ const auth = require('../middleware/auth');
 const userCtrl = require('../controllers/user');
 const hasRights = require('../middleware/hasRights');
 
-router.get('/getUserById',  auth, userCtrl.getOneById);
+router.post('/getUserById',  auth, userCtrl.getOneById);
 
 router.post('/signup', userCtrl.signup);
 
