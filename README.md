@@ -6,6 +6,8 @@ This backend has been made with nodeJS and Sequelize. You can plug in your datab
 npx sequelize-cli db:migrate
 ```
 
+You'll also need to create a .env file with a variable SECRET_PHRASE= containing your secret phrase to use with the jsonwebtoken (example: SECRET_PHRASE=mySecretPhrase)
+
 ## Project setup
 You'll need npm so you can install everything needed with this command
 ```
