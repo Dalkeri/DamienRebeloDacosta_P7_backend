@@ -6,7 +6,6 @@ const hasRights = require('../middleware/hasRights');
 const commentCtrl = require('../controllers/comment');
 
 router.post('/create/',auth, commentCtrl.create);
-// router.get('/:threadId', commentCtrl.getAll);
 router.put('/:id/modify/',auth, hasRights, commentCtrl.modify);
 router.delete('/:id', auth, hasRights, commentCtrl.delete);
 
