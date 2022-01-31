@@ -32,7 +32,7 @@ module.exports = async (req, res, next) => {
   } catch {
     return res.status(401).json({
     //   error: new Error('Invalid request!'),
-      message: "You don't have rights for this action."
+      message: "Vous n'avez pas les droits pour cette action."
     });
   }
 };
